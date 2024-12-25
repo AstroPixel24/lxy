@@ -6,10 +6,9 @@
 <title>monkeytype!!!!</title>
 <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
 <style>
-    /* ~~~~~~~~~~~ Overall Page ~~~~~~~~~~~ */
     body {
-        background: #2f4f2f; /* Christmas green */
-        color: #f0e68c; /* Soft golden color for text */
+        background: #2f4f2f; 
+        color: #f0e68c; 
         font-family: 'Comic Sans MS', cursive, sans-serif;
         display: flex;
         flex-direction: column;
@@ -19,7 +18,7 @@
         margin: 0;
         padding-top: 40px;
         position: relative;
-        overflow-x: hidden; /* Prevent horizontal overflow */
+        overflow-x: hidden; 
     }
 
     .container {
@@ -32,8 +31,8 @@
     h1 {
         font-size: 2.5rem;
         margin-bottom: 20px;
-        color: #ffcccc; /* Light pink for a warm touch */
-        text-shadow: 2px 2px #ff6f61; /* Subtle shadow for depth */
+        color: #ffcccc;
+        text-shadow: 2px 2px #ff6f61;
     }
 
     .message {
@@ -47,7 +46,7 @@
         font-size: 1.5rem;
         line-height: 1.5;
         margin-bottom: 20px;
-        border-bottom: 2px solid #3b873b; /* Slightly darker green for contrast */
+        border-bottom: 2px solid #3b873b; 
         padding-bottom: 10px;
         text-align: left;
         position: relative;
@@ -55,22 +54,22 @@
 
     .char {
         display: inline-block;
-        white-space: pre; /* preserve spaces visually */
+        white-space: pre; 
         padding: 0 1px;
-        color: #777; /* untyped color */
+        color: #777;
         position: relative;
     }
 
     .char.correct {
-        color: #79c779; /* Green for correct */
+        color: #79c779; 
     }
 
     .char.incorrect {
-        color: #ff6060; /* Red for incorrect */
+        color: #ff6060; 
     }
 
     .char.current {
-        background: #3b873b; /* Highlight for the current character */
+        background: #3b873b;
         color: #fff;
         border-radius: 4px;
     }
@@ -79,7 +78,7 @@
         margin-top: 20px;
         font-size: 1.2rem;
         font-weight: bold;
-        color: #fffaf0; /* Ivory-like tone for elegance */
+        color: #fffaf0; 
     }
 
     #hiddenInput {
@@ -88,7 +87,6 @@
         left: -9999px;
     }
 
-    /* ~~~~~~~~~~~ Buttons ~~~~~~~~~~~ */
     .button-container {
         display: none;
         margin-top: 20px;
@@ -108,11 +106,11 @@
         font-size: 2rem;
         color: #fff;
         border: none;
-        cursor: not-allowed; /* Disabled cursor initially */
+        cursor: not-allowed; 
         outline: none;
         animation: pulse 1.5s infinite;
         box-shadow: 0 0 15px rgba(255, 102, 102, 0.7);
-        opacity: 0.6; /* Faded appearance for disabled state */
+        opacity: 0.6; 
     }
 
     .pulsating-button.enabled {
@@ -134,12 +132,12 @@
     /* ~~~~~~~~~~~ Falling Snowflake ~~~~~~~~~~~ */
     .snowflake {
         position: absolute;
-        top: -50px; /* Start slightly above the top of the viewport */
+        top: -50px; 
         font-size: 2rem;
-        pointer-events: none; /* So it doesn't block clicks */
-        animation: fall 4s linear forwards; /* You can change the duration */
-        color: #fff; /* White snowflake color */
-        z-index: 9999; /* On top of everything */
+        pointer-events: none; 
+        animation: fall 4s linear forwards; 
+        color: #fff; 
+        z-index: 9999; 
     }
 
     @keyframes fall {
@@ -148,7 +146,7 @@
             opacity: 1;
         }
         100% {
-            transform: translateY(110vh); /* Move well below the bottom */
+            transform: translateY(110vh); 
             opacity: 0;
         }
     }
@@ -196,11 +194,9 @@
     let timerInterval = null;
     let isTestRunning = false;
 
-    /* ~~~~~~~~~~~~~~ Initialize test ~~~~~~~~~~~~~~ */
     function startTest() {
         phraseContainer.innerHTML = "";
 
-        // Create spans for each character
         for (let i = 0; i < passage.length; i++) {
             const span = document.createElement('span');
             span.classList.add('char');
@@ -221,7 +217,6 @@
         timerInterval = setInterval(updateStats, 100);
     }
 
-    /* ~~~~~~~~~~~~~~ Highlight current character ~~~~~~~~~~~~~~ */
     function highlightCurrentCharacter() {
         const charElements = phraseContainer.children;
         Array.from(charElements).forEach((el, index) => {
@@ -230,13 +225,11 @@
         });
     }
 
-    /* ~~~~~~~~~~~~~~ Main keystroke logic ~~~~~~~~~~~~~~ */
     function handleKey(e) {
         if (!isTestRunning) return;
 
         const key = e.key;
 
-        // Start timing on first valid character typed
         if (!startTime && key.length === 1) {
             startTime = performance.now();
         }
@@ -251,14 +244,12 @@
             return;
         }
 
-        // If typed a valid character and we haven't finished
         if (key.length === 1 && currentIndex < passage.length) {
             typedCharacters.push(key);
             currentIndex++;
             highlightCurrentCharacter();
             updateCharacterStyles();
 
-            // ~~~~~~~~~~~ CREATE A SNOWFLAKE AFTER TYPING ~~~~~~~~~~~
             createSnowflake();
 
             if (currentIndex === passage.length) {
@@ -267,25 +258,20 @@
         }
     }
 
-    /* ~~~~~~~~~~~~~~ Create falling snowflake ~~~~~~~~~~~~~~ */
     function createSnowflake() {
         const snowflake = document.createElement("div");
         snowflake.classList.add("snowflake");
         snowflake.textContent = "❄️";
 
-        // Random horizontal position
         snowflake.style.left = Math.random() * window.innerWidth + "px";
 
-        // Insert into body
         document.body.appendChild(snowflake);
 
-        // Remove the snowflake after the animation finishes (4s)
         setTimeout(() => {
             snowflake.remove();
         }, 4000);
     }
 
-    /* ~~~~~~~~~~~~~~ Update typed char styles ~~~~~~~~~~~~~~ */
     function updateCharacterStyles() {
         const charElements = phraseContainer.children;
         Array.from(charElements).forEach((el, index) => {
@@ -299,7 +285,6 @@
         });
     }
 
-    /* ~~~~~~~~~~~~~~ Stats update ~~~~~~~~~~~~~~ */
     function updateStats() {
         const elapsed = getElapsedTime();
         timeStatEl.textContent = elapsed.toFixed(1) + "s";
@@ -319,13 +304,12 @@
         return (now - startTime) / 1000;
     }
 
-    /* ~~~~~~~~~~~~~~ End test ~~~~~~~~~~~~~~ */
     function endTest() {
         isTestRunning = false;
         clearInterval(timerInterval);
         updateStats();
 
-        buttonContainer.style.display = "flex";  // Show the buttons
+        buttonContainer.style.display = "flex";  
         screenshotButton.classList.add("enabled");
         nextPageButton.classList.add("enabled");
 
@@ -339,7 +323,6 @@
           `<span>WPM:</span> ${wpm}, <span>Accuracy:</span> ${accuracy.toFixed(1)}%`;
     }
 
-    /* ~~~~~~~~~~~~~~ Screenshot button ~~~~~~~~~~~~~~ */
     screenshotButton.addEventListener("click", () => {
         if (!screenshotButton.classList.contains("enabled")) return;
         html2canvas(document.body).then((canvas) => {
@@ -350,13 +333,11 @@
         });
     });
 
-    /* ~~~~~~~~~~~~~~ Next page button ~~~~~~~~~~~~~~ */
     nextPageButton.addEventListener("click", () => {
         if (!nextPageButton.classList.contains("enabled")) return;
         window.location.href = "date_plan.html";
     });
 
-    /* ~~~~~~~~~~~~~~ Listeners ~~~~~~~~~~~~~~ */
     document.addEventListener('keydown', (e) => {
         if (document.activeElement !== hiddenInput) hiddenInput.focus();
         handleKey(e);

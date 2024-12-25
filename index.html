@@ -78,11 +78,11 @@
     }
 
     .correct {
-      color: #79c779; /* Green for correct */
+      color: #79c779; 
     }
 
     .incorrect {
-      color: #ff6060; /* Red for incorrect */
+      color: #ff6060; 
     }
 
     .snowflake {
@@ -125,14 +125,11 @@
     <input type="text" id="lastName" placeholder="Last Name">
   </div>
 
-  <!-- Pulsating Button -->
   <button class="gift-button" onclick="verifyName()">🎁</button>
 
-  <!-- Result Message -->
   <div id="resultMessage" class="result-message"></div>
 
   <script>
-    // Snowflake generator
     function createSnowflake(x, y) {
       const snowflake = document.createElement('div');
       snowflake.classList.add('snowflake');
@@ -145,19 +142,16 @@
       setTimeout(() => snowflake.remove(), 10000);
     }
 
-    // Generate random snowflakes periodically
     setInterval(() => {
       createSnowflake(Math.random() * window.innerWidth, -50);
     }, 200);
 
-    // Generate snowflakes on click
     document.body.addEventListener('click', (event) => {
-      for (let i = 0; i < 10; i++) { // Generate multiple snowflakes
+      for (let i = 0; i < 10; i++) { 
         createSnowflake(event.clientX + Math.random() * 50 - 25, event.clientY + Math.random() * 50 - 25);
       }
     });
 
-    // Name verification
     function verifyName() {
       const firstName = document.getElementById('firstName').value.trim().toLowerCase();
       const lastName = document.getElementById('lastName').value.trim().toLowerCase();
@@ -170,9 +164,8 @@
         resultMessage.textContent = "Correct! 🎁";
         resultMessage.className = "result-message correct";
 
-        // Transition to the next page after 2 seconds
         setTimeout(() => {
-          window.location.href = "geoguessr.html"; // Replace with the actual URL of the next page
+          window.location.href = "geoguessr.html"; 
         }, 2000);
       } else {
         resultMessage.textContent = "Incorrect! This site is not for you. ";
@@ -180,7 +173,6 @@
       }
     }
 
-    // Rainbow heart tracks
     const heartColors = ["❤️", "💚", "🤍", "💖", "💝"];
     document.addEventListener("mousemove", (event) => {
       const heart = document.createElement("div");
@@ -190,7 +182,6 @@
       heart.style.top = event.pageY + "px";
       document.body.appendChild(heart);
 
-      // Remove the heart after the animation completes
       setTimeout(() => heart.remove(), 1000);
     });
   </script>

@@ -5,7 +5,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>love counter</title>
   <style>
-    /* Make the page fill the height */
     html, body {
       height: 100%;
       margin: 0;
@@ -19,7 +18,6 @@
       flex-direction: column;
     }
 
-    /* Main content grows to fill space above footer */
     .content {
       flex: 1;
       padding: 20px;
@@ -32,7 +30,6 @@
       font-size: 2.5rem;
       margin-bottom: 20px;
     }
-    /* Counter */
     #counter {
       display: flex;
       justify-content: center;
@@ -67,7 +64,6 @@
       font-size: 1.1rem;
     }
 
-    /* Calendar + legend side by side */
     .calendar-container {
       display: flex;
       flex-wrap: wrap;
@@ -102,7 +98,6 @@
       color: white;
       cursor: default;
     }
-    /* Color-coded classes */
     .holiday {
       background-color: #ffebcc;
     }
@@ -116,7 +111,6 @@
       background-color: #ffcce6;
     }
 
-    /* Legend */
     .legend {
       flex: 1;
       min-width: 250px;
@@ -153,7 +147,6 @@
       background-color: #ffcce6;
     }
 
-    /* Next celebrations at bottom of content */
     #next-celebrations {
       margin-top: 30px;
       text-align: left;
@@ -168,7 +161,6 @@
       font-weight: bold;
     }
 
-    /* Heartbeat hearts near bottom of .content */
     .heart {
       font-size: 3em;
       animation: heartbeat 1s infinite;
@@ -178,7 +170,6 @@
       50%      { transform: scale(1.2); }
     }
 
-    /* Footer pinned at bottom, same background color */
     footer {
       text-align: center;
       padding: 10px 0;
@@ -206,7 +197,6 @@
   <div class="content">
     <h1>💖 Our Love Journey 💖</h1>
 
-    <!-- Counter -->
     <div id="counter">
       <div class="time-segment" id="days-segment">
         <span id="days">0</span>
@@ -229,7 +219,6 @@
     <p id="loveTime">You fell in love on August 22, 2024, at 12:50 PM EST 💕</p>
     <div id="details">Click on any time segment to see more details.</div>
 
-    <!-- Calendar + Legend Side by Side -->
     <div class="calendar-container">
       <div id="calendar">
         <h2 id="calendar-title"></h2>
@@ -251,7 +240,6 @@
         </table>
       </div>
 
-      <!-- Legend on the right -->
       <div class="legend">
         <h3>Color Coding</h3>
         <div class="legend-item">
@@ -269,7 +257,6 @@
       </div>
     </div>
 
-    <!-- Next celebrations always visible -->
     <div id="next-celebrations">
       <div class="celebration-item" id="next-holiday"><span class="title">Next Holiday:</span> </div>
       <div class="celebration-item" id="next-weekly-anniversary"><span class="title">Next Weekly Anniversary:</span> </div>
@@ -277,7 +264,6 @@
       <div class="celebration-item" id="next-birthday"><span class="title">Next Birthday:</span> </div>
     </div>
 
-    <!-- Heartbeat hearts near bottom -->
     <p class="heart">💖💓💕💗💘💞💟</p>
   </div>
 
@@ -286,7 +272,6 @@
   </footer>
 
   <script>
-    /* ~~~~~~~~~~~ START DATE/CONFIG ~~~~~~~~~~~ */
     const loveStartTime = new Date("August 22, 2024 12:50:00 EST").getTime();
     const specialDays = {
       holidays: {
@@ -298,27 +283,24 @@
         "2025-02-10": "Chinese New Year 🧧"
       },
       birthdays: [
-        "2024-11-15", 
-        "2025-05-01",
-        "2025-02-23" // Xinxin's birthday
+        "2024-04-30", 
+        "2025-02-23",
+        "2025-03-07" 
       ],
       weekly: [],
       monthly: [22]
     };
 
-    /* ~~~~~~~~~~~ DEFAULT DATE ~~~~~~~~~~~ */
     const today = new Date();
     let currentYear = today.getFullYear();
     let currentMonth = today.getMonth();
 
-    // If current date < August 2024, default to August 2024
     const august2024 = new Date(2024, 7, 1);
     if (today < august2024) {
       currentYear = 2024;
       currentMonth = 7; 
     }
 
-    /* ~~~~~~~~~~~ COUNTER ~~~~~~~~~~~ */
     function updateCounter() {
       const now = Date.now();
       const elapsed = now - loveStartTime;
@@ -368,9 +350,7 @@
     document.getElementById("minutes-segment").addEventListener("click", () => showDetails("minutes"));
     document.getElementById("seconds-segment").addEventListener("click", () => showDetails("seconds"));
 
-    /* ~~~~~~~~~~~ CALENDAR ~~~~~~~~~~~ */
     function isWeeklyAnniversary(year, month, day) {
-      // Thursday after 2024-08-22
       const dateObj = new Date(year, month, day);
       return dateObj >= new Date("2024-08-22") && dateObj.getDay() === 4;
     }
@@ -427,7 +407,6 @@
       }
       if (!eventName) eventName = "No event";
 
-      // Calculate how many weeks from now
       const now = new Date();
       let msg = "";
       if (dateObj > now) {
@@ -456,7 +435,6 @@
 
     function changeMonth(offset) {
       currentMonth += offset;
-      // Restrict to August 2024 onwards
       if (currentYear === 2024 && currentMonth < 7) {
         currentMonth = 7;
       } else if (currentMonth > 11) {
@@ -469,20 +447,16 @@
       generateCalendar(currentYear, currentMonth);
     }
 
-    /* ~~~~~~~~~~~ NEXT CELEBRATIONS ~~~~~~~~~~~ */
     function findNextCelebration() {
       const today = new Date();
       let celebrations = [];
 
-      // 1. Holidays
       for (const [key] of Object.entries(specialDays.holidays)) {
         celebrations.push(new Date(key));
       }
-      // 2. Birthdays
       for (const date of specialDays.birthdays) {
         celebrations.push(new Date(date));
       }
-      // 3. Weekly Anniversaries (Thursday)
       for (let i = 0; i < 300; i++) {
         const dayCheck = new Date(today);
         dayCheck.setDate(today.getDate() + i);
@@ -490,7 +464,6 @@
           celebrations.push(dayCheck);
         }
       }
-      // 4. Monthly Anniversaries (22nd)
       let tempDate = new Date(today);
       tempDate.setDate(22);
       for (let i = 0; i < 36; i++) {
@@ -548,7 +521,6 @@
       return `${label} on ${weekday}, ${dateString} ${result}`;
     }
 
-    // ~~~~~ INIT ~~~~~
     generateCalendar(currentYear, currentMonth);
     setInterval(updateCounter, 1000);
     updateCounter();

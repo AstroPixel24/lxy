@@ -209,7 +209,6 @@
     const nextButton = document.getElementById('nextButton');
     const finalNextButton = document.getElementById('finalNextButton');
 
-    // Ensure pop-out works from the start
     document.querySelectorAll('.letter-container img').forEach((img) => {
         img.addEventListener('click', () => {
             const isPopped = img.classList.contains('pop-out');
@@ -218,19 +217,16 @@
         });
     });
 
-    // Show second letter when next button is clicked
     nextButton.addEventListener('click', () => {
         letter2.classList.remove('hidden');
         letter2.classList.add('visible');
         nextButton.style.display = 'none';
 
-        // Show the final next button after 5 seconds
         setTimeout(() => {
             finalNextButton.classList.remove('hidden');
         }, 5000);
     });
 
-    // Redirect to countdown.html when the final next button is clicked
     finalNextButton.addEventListener('click', () => {
         window.location.href = "ending.html";
     });

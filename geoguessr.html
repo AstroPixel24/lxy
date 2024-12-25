@@ -95,11 +95,11 @@
     }
 
     #verification-message.success {
-      color: #66b266; /* Green */
+      color: #66b266; 
     }
 
     #verification-message.error {
-      color: #ff0000; /* Red */
+      color: #ff0000; 
     }
 
     #progress-bar-container {
@@ -140,29 +140,25 @@
 
   <script src="https://unpkg.com/leaflet@1.9.3/dist/leaflet.js"></script>
   <script>
-    // Initial map setup
-    const map = L.map('map').setView([0, 0], 2); // Centered at 0,0 with zoom level 2 (world view)
+    const map = L.map('map').setView([0, 0], 2); 
 
-    // Add OpenStreetMap tiles
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
       maxZoom: 18,
       attribution: '© OpenStreetMap'
     }).addTo(map);
 
-    // Add marker for her guess
     let guessMarker;
     map.on('click', (e) => {
       if (guessMarker) {
-        map.removeLayer(guessMarker); // Remove the previous marker
+        map.removeLayer(guessMarker); 
       }
-      guessMarker = L.marker(e.latlng).addTo(map); // Add a simple marker
+      guessMarker = L.marker(e.latlng).addTo(map); 
     });
 
-    // Correct location
+    // jhu ><
     const targetLat = 39.33000605999728;
     const targetLng = -76.62059957805523;
 
-    // Submit guess function
     function submitGuess() {
       const verificationMessage = document.getElementById("verification-message");
       const progressBarContainer = document.getElementById("progress-bar-container");
@@ -181,40 +177,36 @@
       const guessedLng = guessCoords.lng;
 
       const distance = calculateDistance(guessedLat, guessedLng, targetLat, targetLng);
-      const score = Math.round(5000 * Math.exp(-10 * distance / 20036)); // Max Earth's circumference in km
+      const score = Math.round(5000 * Math.exp(-10 * distance / 20036)); 
 
       if (score >= 4900) {
-        // If guess is correct
         verificationMessage.textContent = "Verification Passed! 🎉";
         verificationMessage.className = "success";
         verificationMessage.style.display = "block";
 
-        // Show progress bar
         progressBarContainer.style.display = "block";
         progressBar.style.width = `${(score / 5000) * 100}%`;
         progressBar.textContent = `${score} points`;
 
-        // Change button to green checkmark and make it redirect to the next page
         submitButton.textContent = "✅";
         submitButton.className = "pin-button success";
         submitButton.onclick = () => {
-          window.location.href = "lovetype.html"; // Redirect to the next page
+          window.location.href = "lovetype.html"; 
         };
       } else {
-        // If guess is incorrect
         verificationMessage.textContent = "Verification Failed.";
         verificationMessage.className = "error";
         verificationMessage.style.display = "block";
 
         setTimeout(() => {
-          window.location.href = "verification.html"; // Redirect back to the first page
-        }, 2000); // Wait 2 seconds before redirecting
+          window.location.href = "verification.html"; 
+        }, 2000); 
       }
     }
 
-    // Calculate distance between two lat/lng points using Haversine formula
+    // uses haversine formula
     function calculateDistance(lat1, lon1, lat2, lon2) {
-      const R = 6371; // Radius of the Earth in km
+      const R = 6371; 
       const dLat = deg2rad(lat2 - lat1);
       const dLon = deg2rad(lat2 - lat1);
       const a =
@@ -222,7 +214,7 @@
         Math.cos(deg2rad(lat1)) * Math.cos(deg2rad(lat2)) *
         Math.sin(dLon / 2) * Math.sin(dLon / 2);
       const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-      return R * c; // Distance in km
+      return R * c; 
     }
 
     function deg2rad(deg) {
