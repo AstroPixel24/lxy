@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>date planning YAY</title>
+<style>
+    body {
+        background: #ffe6e6; /* Soft pink for a romantic vibe */
+        color: #ff6666; /* Vibrant red for text */
+        font-family: 'Comic Sans MS', cursive, sans-serif;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        min-height: 100vh;
+        margin: 0;
+        padding: 20px;
+        box-sizing: border-box;
+        overflow: hidden;
+    }
+
+    h1 {
+        font-size: 2.5rem;
+        margin-bottom: 20px;
+        text-align: center;
+        color: #ff3333;
+        text-shadow: 2px 2px #ffc0cb;
+    }
+
+    .options-container {
+        display: grid;
+        grid-template-columns: repeat(6, 1fr); /* Two rows of six columns */
+        gap: 15px;
+        width: 100%;
+        max-width: 1200px;
+        justify-content: center;
+    }
+
+    .option {
+        background-color: #ffcccc;
+        border: 2px solid #ff9999;
+        border-radius: 10px;
+        padding: 10px;
+        font-size: 1rem;
+        text-align: center;
+        cursor: pointer;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        transition: transform 0.2s, box-shadow 0.2s;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .option img {
+        width: 100px;
+        height: 100px;
+        object-fit: cover;
+        margin-top: 10px;
+        border-radius: 8px;
+        border: 2px solid #ff9999;
+    }
+
+    .option:hover {
+        transform: scale(1.05);
+        box-shadow: 0 6px 10px rgba(0, 0, 0, 0.15);
+    }
+
+    .selected {
+        background-color: #ff9999;
+        color: #fff;
+        font-weight: bold;
+        box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+    }
+
+    .confirmation {
+        margin-top: 20px;
+        font-size: 1.5rem;
+        text-align: center;
+        color: #ff3333;
+        animation: fadeIn 0.5s;
+        min-height: 40px; /* A bit of space for dynamic messages */
+    }
+
+    @keyframes fadeIn {
+        from {
+            opacity: 0;
+        }
+        to {
+            opacity: 1;
+        }
+    }
+
+    #nextButton, #arrowButton {
+        margin-top: 20px;
+        padding: 10px 20px;
+        font-size: 1.2rem;
+        background-color: #ff6666;
+        color: #fff;
+        border: none;
+        border-radius: 8px;
+        cursor: pointer;
+        transition: background-color 0.3s;
+        animation: pulse 1.5s infinite;
+        box-shadow: 0 0 15px rgba(255, 102, 102, 0.7);
+    }
+
+    @keyframes pulse {
+        0%, 100% {
+            transform: scale(1);
+            box-shadow: 0 0 15px rgba(255, 102, 102, 0.7);
+        }
+        50% {
+            transform: scale(1.2);
+            box-shadow: 0 0 25px rgba(255, 102, 102, 1);
+        }
+    }
+
+    .emoji {
+        position: absolute;
+        font-size: 2rem;
+        animation: fall 3s linear infinite;
+    }
+
+    @keyframes fall {
+        0% {
+            top: -50px;
+            opacity: 1;
+        }
+        100% {
+            top: 100vh;
+            opacity: 0;
+        }
+    }
+
+    .summary {
+        margin-top: 30px;
+        font-size: 1.5rem;
+        color: #ff3333;
+    }
+</style>
+</head>
+<body>
+
+<h1>Plan Our Next Dates! ❤️</h1>
+
+<div class="options-container" id="optionsContainer">
+  <div class="option" data-option="Lego Building" data-emoji="🧱">
+      Lego Building
+      <img src="date_images/lego_building.jpg" alt="Lego Building" />
+  </div>
+  <div class="option" data-option="Baking" data-emoji="🧁">
+      Baking
+      <img src="date_images/baking.jpg" alt="Baking" />
+  </div>
+  <div class="option" data-option="Cooking" data-emoji="🍳">
+      Cooking
+      <img src="date_images/cooking.png" alt="Cooking" />
+  </div>
+  <div class="option" data-option="Building a Fort" data-emoji="🏰">
+      Building a Fort
+      <img src="date_images/building_a_fort.jpg" alt="Building a Fort" />
+  </div>
+  <div class="option" data-option="Pottery Painting" data-emoji="🎨">
+      Pottery Painting
+      <img src="date_images/pottery_painting.jpg" alt="Pottery Painting" />
+  </div>
+  <div class="option" data-option="Picnic" data-emoji="🍇">
+      Picnic
+      <img src="date_images/picnic.jpg" alt="Picnic" />
+  </div>
+  <div class="option" data-option="Dog Cafe" data-emoji="🐾">
+      Dog Cafe
+      <img src="date_images/dog_cafe.jpg" alt="Dog Cafe" />
+  </div>
+  <div class="option" data-option="Costco" data-emoji="🛒">
+      Costco
+      <img src="date_images/costco.jpg" alt="Costco" />
+  </div>
+  <div class="option" data-option="Board Games" data-emoji="🎲">
+      Board Games
+      <img src="date_images/board_games.jpg" alt="Board Games" />
+  </div>
+  <div class="option" data-option="Napping" data-emoji="💤">
+      Napping
+      <img src="date_images/napping.jpg" alt="Napping" />
+  </div>
+  <div class="option" data-option="K-Drama" data-emoji="🎥">
+      K-Drama
+      <img src="date_images/kdrama.jpg" alt="K-Drama" />
+  </div>
+  <div class="option" data-option="Interlocking Toes" data-emoji="❤️">
+      Interlocking Toes
+      <img src="date_images/interlocking_toes.png" alt="Interlocking Toes" />
+  </div>
+</div>
+
+<div id="confirmation" class="confirmation">
+    Select our first date!
+</div>
+
+<button id="nextButton" style="display: none;">Finalize Plan</button>
+<button id="arrowButton" style="display: none;">➡️</button>
+
+<div id="summary" class="summary" style="display: none;"></div>
+
+<script>
+    const optionsContainer = document.getElementById("optionsContainer");
+    const confirmation = document.getElementById("confirmation");
+    const nextButton = document.getElementById("nextButton");
+    const arrowButton = document.getElementById("arrowButton");
+    const summary = document.getElementById("summary");
+
+    let selectedOptions = [];
+    const prompts = [
+        "Select our first date!",
+        "YAYAYAYYYAY!!!! Now select our second date!",
+        "YIPPPEEEEEEEE!!!! Finally, select our third date!",
+        "All done! Click finalize to confirm!",
+    ];
+
+    optionsContainer.addEventListener("click", (e) => {
+        const clickedOption = e.target.closest(".option");
+        if (!clickedOption) return;
+
+        const optionName = clickedOption.dataset.option;
+
+        if (selectedOptions.includes(optionName)) {
+            selectedOptions = selectedOptions.filter(opt => opt !== optionName);
+            clickedOption.classList.remove("selected");
+            confirmation.textContent = prompts[selectedOptions.length];
+        } else if (selectedOptions.length < 3) {
+            selectedOptions.push(optionName);
+            clickedOption.classList.add("selected");
+            startEmojiRain(clickedOption.dataset.emoji);
+
+            if (selectedOptions.length < 3) {
+                confirmation.textContent = prompts[selectedOptions.length];
+            } else {
+                confirmation.textContent = prompts[3];
+                nextButton.style.display = "block";
+            }
+        }
+    });
+
+    nextButton.addEventListener("click", () => {
+        summary.style.display = "block";
+        summary.textContent = `Here's what we planned: ${selectedOptions.map(opt => `${opt} date`).join(', ')}`;
+        nextButton.style.display = "none";
+        arrowButton.style.display = "block";
+    });
+
+    arrowButton.addEventListener("click", () => {
+        window.location.href = "letter.html"; 
+    });
+
+    function startEmojiRain(emoji) {
+        const interval = setInterval(() => {
+            const emojiElement = document.createElement("div");
+            emojiElement.classList.add("emoji");
+            emojiElement.textContent = emoji;
+            emojiElement.style.left = Math.random() * window.innerWidth + "px";
+            emojiElement.style.animationDuration = Math.random() * 2 + 3 + "s";
+            document.body.appendChild(emojiElement);
+
+            setTimeout(() => emojiElement.remove(), 3000);
+        }, 100);
+
+        setTimeout(() => clearInterval(interval), 5000);
+    }
+</script>
+
+</body>
+</html>

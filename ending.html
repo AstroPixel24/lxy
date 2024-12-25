@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>last page (or not?)</title>
+  <script src="https://cdn.plot.ly/plotly-2.24.0.min.js"></script>
+
+  <script>
+    window.MathJax = {
+      tex: {
+        inlineMath: [['$', '$'], ['\\(', '\\)']]
+      }
+    };
+  </script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js"></script>
+
+  <style>
+    html, body {
+      height: 100%;
+      margin: 0;
+      padding: 0;
+    }
+    body {
+      font-family: 'Comic Sans MS', cursive, sans-serif;
+      background: linear-gradient(to bottom, #ffe6e6, #ffcccc);
+      color: #ff69b4;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center; 
+      text-align: center;
+    }
+
+    .container {
+      width: 90%;
+      max-width: 1200px;
+      margin: 0 auto;
+      display: flex;
+      flex-direction: column;
+      align-items: center; 
+    }
+
+    h1 {
+      margin-top: 20px;
+      font-size: 2rem;
+      margin-bottom: 10px;
+    }
+
+    .sub-message {
+      font-size: 1.1rem;
+      max-width: 700px;
+      line-height: 1.6;
+      margin-bottom: 20px;
+    }
+
+    #heartGraph {
+      width: 80vw;   
+      height: 55vh;  
+      max-width: 1000px;
+      max-height: 800px;
+      margin-bottom: 20px;
+    }
+
+    .equation {
+      font-size: 1.1rem;
+      margin-bottom: 30px;
+      font-style: italic;
+    }
+
+    .gift-button {
+      margin-top: 10px;
+      width: 100px;
+      height: 100px;
+      background-color: #ff69b4; 
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 2rem;
+      color: #fff;
+      border: none;
+      cursor: pointer;
+      outline: none;
+      animation: pulse 1.5s infinite;
+      box-shadow: 0 0 15px rgba(255, 102, 102, 0.7);
+    }
+    @keyframes pulse {
+      0%, 100% {
+        transform: scale(1);
+        box-shadow: 0 0 15px rgba(255, 102, 102, 0.7);
+      }
+      50% {
+        transform: scale(1.2);
+        box-shadow: 0 0 25px rgba(255, 102, 102, 1);
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+
+    <h1>it's the last page 😞 (or is it?)</h1>
+
+    <div class="sub-message">
+      I hope that you enjoyed this gift as much as i enjoyed making it for you!<br>
+      I love you so much ml 🥹
+    </div>
+
+    <div id="heartGraph"></div>
+
+    <div class="equation">
+      $$\bigl(x^{2} + \tfrac{9}{4}y^{2} + z^{2} - 1\bigr)^{3} \;-\; x^{2}z^{3} \;-\; \tfrac{9}{80}y^{2}z^{3} = 0$$
+    </div>
+
+    <button class="gift-button" onclick="goToCalendar()">📅</button>
+
+  </div>
+
+  <script>
+    function goToCalendar() {
+      window.location.href = "calendar.html";
+    }
+
+    /* isosurface for:
+      (x^2 + 9/4*y^2 + z^2 - 1)^3 - x^2*z^3 - (9/80)*y^2*z^3 = 0
+    */
+    const Nx = 60, Ny = 60, Nz = 60;
+    const xMin = -1.5, xMax = 1.5;
+    const yMin = -1.2, yMax = 1.2;
+    const zMin = -1.2, zMax = 1.5;
+
+    const allX = [], allY = [], allZ = [], allF = [];
+
+    const xVals = [];
+    for (let i = 0; i < Nx; i++) {
+      xVals.push(xMin + i*(xMax - xMin)/(Nx-1));
+    }
+    const yVals = [];
+    for (let j = 0; j < Ny; j++) {
+      yVals.push(yMin + j*(yMax - yMin)/(Ny-1));
+    }
+    const zVals = [];
+    for (let k = 0; k < Nz; k++) {
+      zVals.push(zMin + k*(zMax - zMin)/(Nz-1));
+    }
+
+    for (let ix = 0; ix < Nx; ix++) {
+      const x = xVals[ix];
+      for (let iy = 0; iy < Ny; iy++) {
+        const y = yVals[iy];
+        for (let iz = 0; iz < Nz; iz++) {
+          const z = zVals[iz];
+          const term1 = x*x + (9/4)*y*y + z*z - 1;
+          const F = Math.pow(term1, 3) - x*x*Math.pow(z,3) - (9/80)*y*y*Math.pow(z,3);
+
+          allX.push(x);
+          allY.push(y);
+          allZ.push(z);
+          allF.push(F);
+        }
+      }
+    }
+
+    const data = [{
+      type: 'isosurface',
+      x: allX,
+      y: allY,
+      z: allZ,
+      value: allF,
+      isomin: 0,
+      isomax: 0,
+      surface: { fill: 1 },
+      colorscale: 'RdPu',  
+      caps: { x: false, y: false, z: false },
+      showscale: true
+    }];
+
+    const layout = {
+      scene: {
+        xaxis: { visible: false },
+        yaxis: { visible: false },
+        zaxis: { visible: false },
+        camera: {
+          eye: { x: 1.3, y: 1.3, z: 0.9 }
+        }
+      },
+      paper_bgcolor: 'rgba(0,0,0,0)',
+      plot_bgcolor: 'rgba(0,0,0,0)',
+      margin: { l:0, r:0, t:0, b:0 }
+    };
+
+    Plotly.newPlot('heartGraph', data, layout);
+  </script>
+</body>
+</html>

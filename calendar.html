@@ -1,0 +1,557 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>love counter</title>
+  <style>
+    /* Make the page fill the height */
+    html, body {
+      height: 100%;
+      margin: 0;
+      padding: 0;
+    }
+    body {
+      font-family: 'Comic Sans MS', cursive, sans-serif;
+      background: linear-gradient(to bottom, #ffe6e6, #ffcccc);
+      color: #ff69b4;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* Main content grows to fill space above footer */
+    .content {
+      flex: 1;
+      padding: 20px;
+      max-width: 1200px;
+      margin: 0 auto;
+      text-align: center;
+    }
+
+    h1 {
+      font-size: 2.5rem;
+      margin-bottom: 20px;
+    }
+    /* Counter */
+    #counter {
+      display: flex;
+      justify-content: center;
+      gap: 20px;
+      margin-bottom: 20px;
+      flex-wrap: wrap;
+    }
+    .time-segment {
+      display: inline-block;
+      margin: 10px;
+      padding: 15px;
+      background: #ffffff;
+      border: 3px solid #ff69b4;
+      border-radius: 10px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+      cursor: pointer;
+    }
+    .time-segment span {
+      display: block;
+      font-size: 2rem;
+    }
+    .time-segment small {
+      font-size: 0.8rem;
+    }
+    #details {
+      margin-top: 20px;
+      font-size: 1.2rem;
+    }
+    #loveTime {
+      margin: 20px 0;
+      font-weight: bold;
+      font-size: 1.1rem;
+    }
+
+    /* Calendar + legend side by side */
+    .calendar-container {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      margin-top: 20px;
+    }
+    #calendar {
+      margin: 0 auto;
+      text-align: center;
+      flex: 1;
+      min-width: 300px;
+      max-width: 600px;
+    }
+    #calendar h2 {
+      margin-bottom: 10px;
+      font-size: 1.5rem;
+    }
+    #calendar table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 0 auto;
+    }
+    #calendar th, #calendar td {
+      border: 1px solid #ff69b4;
+      padding: 10px;
+      text-align: center;
+      cursor: pointer;
+      position: relative;
+    }
+    #calendar th {
+      background-color: #ff69b4;
+      color: white;
+      cursor: default;
+    }
+    /* Color-coded classes */
+    .holiday {
+      background-color: #ffebcc;
+    }
+    .birthday {
+      background-color: #d1f7c4;
+    }
+    .weekly-anniversary {
+      background-color: #cce7ff;
+    }
+    .monthly-anniversary {
+      background-color: #ffcce6;
+    }
+
+    /* Legend */
+    .legend {
+      flex: 1;
+      min-width: 250px;
+      max-width: 300px;
+      margin-left: 20px;
+      text-align: left;
+    }
+    .legend h3 {
+      margin-top: 0;
+      font-size: 1.2rem;
+      margin-bottom: 10px;
+    }
+    .legend-item {
+      display: flex;
+      align-items: center;
+      margin-bottom: 8px;
+    }
+    .legend-color-box {
+      width: 20px;
+      height: 20px;
+      margin-right: 10px;
+      border: 1px solid #aaa;
+    }
+    .holiday-box {
+      background-color: #ffebcc;
+    }
+    .birthday-box {
+      background-color: #d1f7c4;
+    }
+    .weekly-box {
+      background-color: #cce7ff;
+    }
+    .monthly-box {
+      background-color: #ffcce6;
+    }
+
+    /* Next celebrations at bottom of content */
+    #next-celebrations {
+      margin-top: 30px;
+      text-align: left;
+      display: inline-block;
+    }
+    .celebration-item {
+      margin-bottom: 10px;
+      font-size: 1rem;
+      text-align: left;
+    }
+    .celebration-item span.title {
+      font-weight: bold;
+    }
+
+    /* Heartbeat hearts near bottom of .content */
+    .heart {
+      font-size: 3em;
+      animation: heartbeat 1s infinite;
+    }
+    @keyframes heartbeat {
+      0%, 100% { transform: scale(1); }
+      50%      { transform: scale(1.2); }
+    }
+
+    /* Footer pinned at bottom, same background color */
+    footer {
+      text-align: center;
+      padding: 10px 0;
+      font-size: 0.8rem;
+      color: #ff69b4;
+    }
+
+    .nav-button {
+      cursor: pointer;
+      background-color: #ff69b4;
+      color: white;
+      border: none;
+      padding: 5px 10px;
+      margin: 5px;
+      border-radius: 5px;
+      font-size: 1rem;
+    }
+    .nav-button:hover {
+      background-color: #ff3e81;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="content">
+    <h1>💖 Our Love Journey 💖</h1>
+
+    <!-- Counter -->
+    <div id="counter">
+      <div class="time-segment" id="days-segment">
+        <span id="days">0</span>
+        <small>Days</small>
+      </div>
+      <div class="time-segment" id="hours-segment">
+        <span id="hours">0</span>
+        <small>Hours</small>
+      </div>
+      <div class="time-segment" id="minutes-segment">
+        <span id="minutes">0</span>
+        <small>Minutes</small>
+      </div>
+      <div class="time-segment" id="seconds-segment">
+        <span id="seconds">0</span>
+        <small>Seconds</small>
+      </div>
+    </div>
+
+    <p id="loveTime">You fell in love on August 22, 2024, at 12:50 PM EST 💕</p>
+    <div id="details">Click on any time segment to see more details.</div>
+
+    <!-- Calendar + Legend Side by Side -->
+    <div class="calendar-container">
+      <div id="calendar">
+        <h2 id="calendar-title"></h2>
+        <button class="nav-button" id="prev-button" onclick="changeMonth(-1)">&lt; Prev</button>
+        <button class="nav-button" id="next-button" onclick="changeMonth(1)">Next &gt;</button>
+        <table id="calendar-table">
+          <thead>
+            <tr>
+              <th>Sun</th>
+              <th>Mon</th>
+              <th>Tue</th>
+              <th>Wed</th>
+              <th>Thu</th>
+              <th>Fri</th>
+              <th>Sat</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+
+      <!-- Legend on the right -->
+      <div class="legend">
+        <h3>Color Coding</h3>
+        <div class="legend-item">
+          <div class="legend-color-box holiday-box"></div> Holiday
+        </div>
+        <div class="legend-item">
+          <div class="legend-color-box birthday-box"></div> Birthday
+        </div>
+        <div class="legend-item">
+          <div class="legend-color-box weekly-box"></div> Weekly Anniversary (Thursday)
+        </div>
+        <div class="legend-item">
+          <div class="legend-color-box monthly-box"></div> Monthly Anniversary (22nd)
+        </div>
+      </div>
+    </div>
+
+    <!-- Next celebrations always visible -->
+    <div id="next-celebrations">
+      <div class="celebration-item" id="next-holiday"><span class="title">Next Holiday:</span> </div>
+      <div class="celebration-item" id="next-weekly-anniversary"><span class="title">Next Weekly Anniversary:</span> </div>
+      <div class="celebration-item" id="next-monthly-anniversary"><span class="title">Next Monthly Anniversary:</span> </div>
+      <div class="celebration-item" id="next-birthday"><span class="title">Next Birthday:</span> </div>
+    </div>
+
+    <!-- Heartbeat hearts near bottom -->
+    <p class="heart">💖💓💕💗💘💞💟</p>
+  </div>
+
+  <footer>
+    Made with love for xinxin 💕
+  </footer>
+
+  <script>
+    /* ~~~~~~~~~~~ START DATE/CONFIG ~~~~~~~~~~~ */
+    const loveStartTime = new Date("August 22, 2024 12:50:00 EST").getTime();
+    const specialDays = {
+      holidays: {
+        "2024-12-25": "Christmas 🎄",
+        "2025-01-01": "New Year 🎆",
+        "2025-02-14": "Valentine's Day 💘",
+        "2024-08-01": "National GF Day 🥰",
+        "2024-10-03": "National BF Day 💕",
+        "2025-02-10": "Chinese New Year 🧧"
+      },
+      birthdays: [
+        "2024-11-15", 
+        "2025-05-01",
+        "2025-02-23" // Xinxin's birthday
+      ],
+      weekly: [],
+      monthly: [22]
+    };
+
+    /* ~~~~~~~~~~~ DEFAULT DATE ~~~~~~~~~~~ */
+    const today = new Date();
+    let currentYear = today.getFullYear();
+    let currentMonth = today.getMonth();
+
+    // If current date < August 2024, default to August 2024
+    const august2024 = new Date(2024, 7, 1);
+    if (today < august2024) {
+      currentYear = 2024;
+      currentMonth = 7; 
+    }
+
+    /* ~~~~~~~~~~~ COUNTER ~~~~~~~~~~~ */
+    function updateCounter() {
+      const now = Date.now();
+      const elapsed = now - loveStartTime;
+
+      const seconds = Math.floor((elapsed / 1000) % 60);
+      const minutes = Math.floor((elapsed / (1000 * 60)) % 60);
+      const hours = Math.floor((elapsed / (1000 * 60 * 60)) % 24);
+      const days = Math.floor(elapsed / (1000 * 60 * 60 * 24));
+
+      document.getElementById("days").textContent = days;
+      document.getElementById("hours").textContent = hours;
+      document.getElementById("minutes").textContent = minutes;
+      document.getElementById("seconds").textContent = seconds;
+
+      findNextCelebration(); 
+      return { days, hours, minutes, seconds, elapsed };
+    }
+
+    function showDetails(type) {
+      const now = Date.now();
+      const elapsed = now - loveStartTime;
+
+      let message = "";
+      switch (type) {
+        case "days":
+          const totalDays = Math.floor(elapsed / (1000 * 60 * 60 * 24));
+          message = `You've been together for approximately ${totalDays} days.`;
+          break;
+        case "hours":
+          const totalHours = Math.floor(elapsed / (1000 * 60 * 60));
+          message = `You've been together for approximately ${totalHours} hours.`;
+          break;
+        case "minutes":
+          const totalMinutes = Math.floor(elapsed / (1000 * 60));
+          message = `You've been together for approximately ${totalMinutes} minutes.`;
+          break;
+        case "seconds":
+          const totalSeconds = Math.floor(elapsed / 1000);
+          message = `You've been together for approximately ${totalSeconds} seconds.`;
+          break;
+      }
+      document.getElementById("details").textContent = message;
+    }
+
+    document.getElementById("days-segment").addEventListener("click", () => showDetails("days"));
+    document.getElementById("hours-segment").addEventListener("click", () => showDetails("hours"));
+    document.getElementById("minutes-segment").addEventListener("click", () => showDetails("minutes"));
+    document.getElementById("seconds-segment").addEventListener("click", () => showDetails("seconds"));
+
+    /* ~~~~~~~~~~~ CALENDAR ~~~~~~~~~~~ */
+    function isWeeklyAnniversary(year, month, day) {
+      // Thursday after 2024-08-22
+      const dateObj = new Date(year, month, day);
+      return dateObj >= new Date("2024-08-22") && dateObj.getDay() === 4;
+    }
+
+    function formatDateString(y, m, d) {
+      return `${y}-${String(m).padStart(2, "0")}-${String(d).padStart(2, "0")}`;
+    }
+
+    function generateCalendar(year, month) {
+      const firstDay = new Date(year, month, 1).getDay();
+      const daysInMonth = new Date(year, month + 1, 0).getDate();
+      const calendarTable = document.querySelector("#calendar-table tbody");
+      const title = document.getElementById("calendar-title");
+
+      title.textContent = new Date(year, month).toLocaleString("default", { month: "long", year: "numeric" });
+      calendarTable.innerHTML = "";
+
+      let date = 1;
+      for (let i = 0; i < 6; i++) {
+        const row = document.createElement("tr");
+        for (let j = 0; j < 7; j++) {
+          const cell = document.createElement("td");
+          if ((i === 0 && j < firstDay) || date > daysInMonth) {
+            cell.textContent = "";
+          } else {
+            cell.textContent = date;
+            const dateString = formatDateString(year, month + 1, date);
+
+            if (specialDays.holidays[dateString]) cell.classList.add("holiday");
+            if (specialDays.birthdays.includes(dateString)) cell.classList.add("birthday");
+            if (specialDays.monthly.includes(date)) cell.classList.add("monthly-anniversary");
+            if (isWeeklyAnniversary(year, month, date)) cell.classList.add("weekly-anniversary");
+
+            cell.addEventListener("click", () => handleDateClick(dateString));
+            date++;
+          }
+          row.appendChild(cell);
+        }
+        calendarTable.appendChild(row);
+      }
+    }
+
+    function handleDateClick(dateString) {
+      let eventName = "";
+      if (specialDays.holidays[dateString]) eventName = specialDays.holidays[dateString];
+      else if (specialDays.birthdays.includes(dateString)) eventName = "Birthday";
+
+      const [year, mon, day] = dateString.split("-").map(Number);
+      const dateObj = new Date(year, mon - 1, day);
+
+      if (!eventName) {
+        if (isWeeklyAnniversary(year, mon - 1, day)) eventName = "Weekly Anniversary";
+        else if (specialDays.monthly.includes(day)) eventName = "Monthly Anniversary";
+      }
+      if (!eventName) eventName = "No event";
+
+      // Calculate how many weeks from now
+      const now = new Date();
+      let msg = "";
+      if (dateObj > now) {
+        const diffDays = Math.ceil((dateObj - now) / (1000 * 60 * 60 * 24));
+        let result = "";
+        if (diffDays < 7) {
+          result = `(in ${diffDays} day${diffDays !== 1 ? "s" : ""})`;
+        } else {
+          const diffWeeks = Math.round(diffDays / 7);
+          result = `(in about ${diffWeeks} week${diffWeeks !== 1 ? "s" : ""})`;
+        }
+        const weekday = dateObj.toLocaleString("default", { weekday: "long" });
+        const dateTxt = dateObj.toLocaleString("default", {
+          month: "long",
+          day: "numeric",
+          year: "numeric",
+        });
+        msg = `${eventName} on ${weekday}, ${dateTxt} ${result}`;
+      } else {
+        msg = (eventName === "No event")
+          ? "No special event here."
+          : `${eventName} date has passed.`;
+      }
+      alert(msg);
+    }
+
+    function changeMonth(offset) {
+      currentMonth += offset;
+      // Restrict to August 2024 onwards
+      if (currentYear === 2024 && currentMonth < 7) {
+        currentMonth = 7;
+      } else if (currentMonth > 11) {
+        currentMonth = 0;
+        currentYear++;
+      } else if (currentMonth < 0) {
+        currentMonth = 11;
+        currentYear--;
+      }
+      generateCalendar(currentYear, currentMonth);
+    }
+
+    /* ~~~~~~~~~~~ NEXT CELEBRATIONS ~~~~~~~~~~~ */
+    function findNextCelebration() {
+      const today = new Date();
+      let celebrations = [];
+
+      // 1. Holidays
+      for (const [key] of Object.entries(specialDays.holidays)) {
+        celebrations.push(new Date(key));
+      }
+      // 2. Birthdays
+      for (const date of specialDays.birthdays) {
+        celebrations.push(new Date(date));
+      }
+      // 3. Weekly Anniversaries (Thursday)
+      for (let i = 0; i < 300; i++) {
+        const dayCheck = new Date(today);
+        dayCheck.setDate(today.getDate() + i);
+        if (dayCheck >= new Date("2024-08-22") && dayCheck.getDay() === 4) {
+          celebrations.push(dayCheck);
+        }
+      }
+      // 4. Monthly Anniversaries (22nd)
+      let tempDate = new Date(today);
+      tempDate.setDate(22);
+      for (let i = 0; i < 36; i++) {
+        if (tempDate >= new Date("2024-08-22")) celebrations.push(new Date(tempDate));
+        tempDate.setMonth(tempDate.getMonth() + 1);
+      }
+      celebrations = celebrations.filter(d => d > today).sort((a, b) => a - b);
+
+      document.getElementById("next-holiday").innerHTML 
+        = `<span class="title">Next Holiday:</span> ` + (findNextOfType("holiday", celebrations, today) || "None");
+      document.getElementById("next-weekly-anniversary").innerHTML 
+        = `<span class="title">Next Weekly Anniversary:</span> ` + (findNextOfType("weekly", celebrations, today) || "None");
+      document.getElementById("next-monthly-anniversary").innerHTML 
+        = `<span class="title">Next Monthly Anniversary:</span> ` + (findNextOfType("monthly", celebrations, today) || "None");
+      document.getElementById("next-birthday").innerHTML 
+        = `<span class="title">Next Birthday:</span> ` + (findNextOfType("birthday", celebrations, today) || "None");
+    }
+
+    function findNextOfType(type, celebrations, today) {
+      for (let dateObj of celebrations) {
+        const iso = dateObj.toISOString().split("T")[0]; // "yyyy-mm-dd"
+        if (type === "holiday" && specialDays.holidays[iso]) {
+          return formatFutureDate(dateObj, today, specialDays.holidays[iso]);
+        }
+        if (type === "birthday" && specialDays.birthdays.includes(iso)) {
+          return formatFutureDate(dateObj, today, "Birthday");
+        }
+        if (type === "weekly" && dateObj.getDay() === 4) {
+          return formatFutureDate(dateObj, today, "Weekly Anniversary");
+        }
+        if (type === "monthly" && dateObj.getDate() === 22) {
+          return formatFutureDate(dateObj, today, "Monthly Anniversary");
+        }
+      }
+      return "";
+    }
+
+    function formatFutureDate(dateObj, today, label) {
+      const diffDays = Math.ceil((dateObj - today) / (1000 * 60 * 60 * 24));
+      if (diffDays < 1) return `${label} date has passed.`;
+
+      let result = "";
+      if (diffDays < 7) {
+        result = `(in ${diffDays} day${diffDays !== 1 ? "s" : ""})`;
+      } else {
+        const diffWeeks = Math.round(diffDays / 7);
+        result = `(in about ${diffWeeks} week${diffWeeks !== 1 ? "s" : ""})`;
+      }
+      const weekday = dateObj.toLocaleString('default', { weekday: 'long' });
+      const dateString = dateObj.toLocaleString("default", {
+        month: "long",
+        day: "numeric",
+        year: "numeric",
+      });
+      return `${label} on ${weekday}, ${dateString} ${result}`;
+    }
+
+    // ~~~~~ INIT ~~~~~
+    generateCalendar(currentYear, currentMonth);
+    setInterval(updateCounter, 1000);
+    updateCounter();
+  </script>
+</body>
+</html>

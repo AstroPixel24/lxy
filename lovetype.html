@@ -1,0 +1,369 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>monkeytype!!!!</title>
+<script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
+<style>
+    /* ~~~~~~~~~~~ Overall Page ~~~~~~~~~~~ */
+    body {
+        background: #2f4f2f; /* Christmas green */
+        color: #f0e68c; /* Soft golden color for text */
+        font-family: 'Comic Sans MS', cursive, sans-serif;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: start;
+        min-height: 100vh;
+        margin: 0;
+        padding-top: 40px;
+        position: relative;
+        overflow-x: hidden; /* Prevent horizontal overflow */
+    }
+
+    .container {
+        max-width: 800px;
+        width: 100%;
+        padding: 20px;
+        text-align: center;
+    }
+
+    h1 {
+        font-size: 2.5rem;
+        margin-bottom: 20px;
+        color: #ffcccc; /* Light pink for a warm touch */
+        text-shadow: 2px 2px #ff6f61; /* Subtle shadow for depth */
+    }
+
+    .message {
+        margin-bottom: 20px;
+        font-size: 1.5rem;
+        color: #ffffff;
+        line-height: 1.8;
+    }
+
+    .phrase-container {
+        font-size: 1.5rem;
+        line-height: 1.5;
+        margin-bottom: 20px;
+        border-bottom: 2px solid #3b873b; /* Slightly darker green for contrast */
+        padding-bottom: 10px;
+        text-align: left;
+        position: relative;
+    }
+
+    .char {
+        display: inline-block;
+        white-space: pre; /* preserve spaces visually */
+        padding: 0 1px;
+        color: #777; /* untyped color */
+        position: relative;
+    }
+
+    .char.correct {
+        color: #79c779; /* Green for correct */
+    }
+
+    .char.incorrect {
+        color: #ff6060; /* Red for incorrect */
+    }
+
+    .char.current {
+        background: #3b873b; /* Highlight for the current character */
+        color: #fff;
+        border-radius: 4px;
+    }
+
+    .stats {
+        margin-top: 20px;
+        font-size: 1.2rem;
+        font-weight: bold;
+        color: #fffaf0; /* Ivory-like tone for elegance */
+    }
+
+    #hiddenInput {
+        position: absolute;
+        opacity: 0;
+        left: -9999px;
+    }
+
+    /* ~~~~~~~~~~~ Buttons ~~~~~~~~~~~ */
+    .button-container {
+        display: none;
+        margin-top: 20px;
+        display: flex;
+        gap: 20px;
+        justify-content: center;
+    }
+
+    .pulsating-button {
+        width: 80px;
+        height: 80px;
+        background-color: #ff6666;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 2rem;
+        color: #fff;
+        border: none;
+        cursor: not-allowed; /* Disabled cursor initially */
+        outline: none;
+        animation: pulse 1.5s infinite;
+        box-shadow: 0 0 15px rgba(255, 102, 102, 0.7);
+        opacity: 0.6; /* Faded appearance for disabled state */
+    }
+
+    .pulsating-button.enabled {
+        cursor: pointer;
+        opacity: 1;
+    }
+
+    @keyframes pulse {
+        0%, 100% {
+            transform: scale(1);
+            box-shadow: 0 0 15px rgba(255, 102, 102, 0.7);
+        }
+        50% {
+            transform: scale(1.2);
+            box-shadow: 0 0 25px rgba(255, 102, 102, 1);
+        }
+    }
+
+    /* ~~~~~~~~~~~ Falling Snowflake ~~~~~~~~~~~ */
+    .snowflake {
+        position: absolute;
+        top: -50px; /* Start slightly above the top of the viewport */
+        font-size: 2rem;
+        pointer-events: none; /* So it doesn't block clicks */
+        animation: fall 4s linear forwards; /* You can change the duration */
+        color: #fff; /* White snowflake color */
+        z-index: 9999; /* On top of everything */
+    }
+
+    @keyframes fall {
+        0% {
+            transform: translateY(0);
+            opacity: 1;
+        }
+        100% {
+            transform: translateY(110vh); /* Move well below the bottom */
+            opacity: 0;
+        }
+    }
+</style>
+</head>
+<body>
+
+<div class="container">
+    <h1>For My Love ❤️</h1>
+    <p class="message">Dear Xinxin,</p>
+    <div class="phrase-container" id="phraseContainer"></div>
+    <p class="message">Yours truly,<br>Aldric</p>
+    <div class="stats" id="stats">
+        Time: <span id="timeStat">0.0s</span> | 
+        WPM: <span id="wpmStat">0</span> | 
+        Accuracy: <span id="accuracyStat">0%</span>
+    </div>
+    <div class="results" id="results"></div>
+
+    <div class="button-container" id="buttonContainer">
+        <button class="pulsating-button" id="screenshotButton">🖨️</button>
+        <button class="pulsating-button" id="nextPageButton">🎁</button>
+    </div>
+
+    <input type="text" id="hiddenInput" 
+           autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" />
+</div>
+
+<script>
+    const passage = "Today is the first of many Christmas days that we're going to celebrate together. It's crazy that it's already been over 4 months, and I just wanted to remind you that you're the cutest, most adorable, most beautiful, gorgeous, smartest, most deserving of love, loveable, kind hearted, and truly amazing girl in the whole world. There's nothing more satisfying in the world than being able to call you my wife - yes, we are going to get married. I love you so much, and Merry Christmas my baby.";
+
+    const phraseContainer = document.getElementById('phraseContainer');
+    const hiddenInput = document.getElementById('hiddenInput');
+    const timeStatEl = document.getElementById('timeStat');
+    const wpmStatEl = document.getElementById('wpmStat');
+    const accuracyStatEl = document.getElementById('accuracyStat');
+    const resultsEl = document.getElementById('results');
+    const buttonContainer = document.getElementById('buttonContainer');
+    const screenshotButton = document.getElementById('screenshotButton');
+    const nextPageButton = document.getElementById('nextPageButton');
+
+    let currentIndex = 0;
+    let typedCharacters = [];
+    let startTime = null;
+    let timerInterval = null;
+    let isTestRunning = false;
+
+    /* ~~~~~~~~~~~~~~ Initialize test ~~~~~~~~~~~~~~ */
+    function startTest() {
+        phraseContainer.innerHTML = "";
+
+        // Create spans for each character
+        for (let i = 0; i < passage.length; i++) {
+            const span = document.createElement('span');
+            span.classList.add('char');
+            span.textContent = passage[i];
+            phraseContainer.appendChild(span);
+        }
+
+        typedCharacters = [];
+        currentIndex = 0;
+        startTime = null;
+        isTestRunning = true;
+
+        highlightCurrentCharacter();
+        hiddenInput.value = "";
+        hiddenInput.focus();
+
+        if (timerInterval) clearInterval(timerInterval);
+        timerInterval = setInterval(updateStats, 100);
+    }
+
+    /* ~~~~~~~~~~~~~~ Highlight current character ~~~~~~~~~~~~~~ */
+    function highlightCurrentCharacter() {
+        const charElements = phraseContainer.children;
+        Array.from(charElements).forEach((el, index) => {
+            el.classList.remove('current');
+            if (index === currentIndex) el.classList.add('current');
+        });
+    }
+
+    /* ~~~~~~~~~~~~~~ Main keystroke logic ~~~~~~~~~~~~~~ */
+    function handleKey(e) {
+        if (!isTestRunning) return;
+
+        const key = e.key;
+
+        // Start timing on first valid character typed
+        if (!startTime && key.length === 1) {
+            startTime = performance.now();
+        }
+
+        if (key === 'Backspace') {
+            if (currentIndex > 0) {
+                currentIndex--;
+                typedCharacters.pop();
+                highlightCurrentCharacter();
+                updateCharacterStyles();
+            }
+            return;
+        }
+
+        // If typed a valid character and we haven't finished
+        if (key.length === 1 && currentIndex < passage.length) {
+            typedCharacters.push(key);
+            currentIndex++;
+            highlightCurrentCharacter();
+            updateCharacterStyles();
+
+            // ~~~~~~~~~~~ CREATE A SNOWFLAKE AFTER TYPING ~~~~~~~~~~~
+            createSnowflake();
+
+            if (currentIndex === passage.length) {
+                endTest();
+            }
+        }
+    }
+
+    /* ~~~~~~~~~~~~~~ Create falling snowflake ~~~~~~~~~~~~~~ */
+    function createSnowflake() {
+        const snowflake = document.createElement("div");
+        snowflake.classList.add("snowflake");
+        snowflake.textContent = "❄️";
+
+        // Random horizontal position
+        snowflake.style.left = Math.random() * window.innerWidth + "px";
+
+        // Insert into body
+        document.body.appendChild(snowflake);
+
+        // Remove the snowflake after the animation finishes (4s)
+        setTimeout(() => {
+            snowflake.remove();
+        }, 4000);
+    }
+
+    /* ~~~~~~~~~~~~~~ Update typed char styles ~~~~~~~~~~~~~~ */
+    function updateCharacterStyles() {
+        const charElements = phraseContainer.children;
+        Array.from(charElements).forEach((el, index) => {
+            el.classList.remove('correct', 'incorrect');
+            if (typedCharacters[index] === undefined) return;
+            if (typedCharacters[index] === passage[index]) {
+                el.classList.add('correct');
+            } else {
+                el.classList.add('incorrect');
+            }
+        });
+    }
+
+    /* ~~~~~~~~~~~~~~ Stats update ~~~~~~~~~~~~~~ */
+    function updateStats() {
+        const elapsed = getElapsedTime();
+        timeStatEl.textContent = elapsed.toFixed(1) + "s";
+
+        const timeInMinutes = elapsed / 60;
+        const correctChars = typedCharacters.filter((c, i) => c === passage[i]).length;
+        const wpm = timeInMinutes > 0 ? Math.round((correctChars / 5) / timeInMinutes) : 0;
+        wpmStatEl.textContent = wpm;
+
+        const accuracy = typedCharacters.length > 0 ? (correctChars / typedCharacters.length) * 100 : 0;
+        accuracyStatEl.textContent = accuracy.toFixed(1) + "%";
+    }
+
+    function getElapsedTime() {
+        if (!startTime) return 0;
+        const now = performance.now();
+        return (now - startTime) / 1000;
+    }
+
+    /* ~~~~~~~~~~~~~~ End test ~~~~~~~~~~~~~~ */
+    function endTest() {
+        isTestRunning = false;
+        clearInterval(timerInterval);
+        updateStats();
+
+        buttonContainer.style.display = "flex";  // Show the buttons
+        screenshotButton.classList.add("enabled");
+        nextPageButton.classList.add("enabled");
+
+        const elapsed = getElapsedTime();
+        const correctChars = typedCharacters.filter((c, i) => c === passage[i]).length;
+        const timeInMinutes = elapsed / 60;
+        const wpm = timeInMinutes > 0 ? Math.round((correctChars / 5) / timeInMinutes) : 0;
+        const accuracy = typedCharacters.length > 0 ? (correctChars / typedCharacters.length) * 100 : 0;
+
+        resultsEl.innerHTML = 
+          `<span>WPM:</span> ${wpm}, <span>Accuracy:</span> ${accuracy.toFixed(1)}%`;
+    }
+
+    /* ~~~~~~~~~~~~~~ Screenshot button ~~~~~~~~~~~~~~ */
+    screenshotButton.addEventListener("click", () => {
+        if (!screenshotButton.classList.contains("enabled")) return;
+        html2canvas(document.body).then((canvas) => {
+            const link = document.createElement("a");
+            link.download = "typing-test.png";
+            link.href = canvas.toDataURL("image/png");
+            link.click();
+        });
+    });
+
+    /* ~~~~~~~~~~~~~~ Next page button ~~~~~~~~~~~~~~ */
+    nextPageButton.addEventListener("click", () => {
+        if (!nextPageButton.classList.contains("enabled")) return;
+        window.location.href = "date_plan.html";
+    });
+
+    /* ~~~~~~~~~~~~~~ Listeners ~~~~~~~~~~~~~~ */
+    document.addEventListener('keydown', (e) => {
+        if (document.activeElement !== hiddenInput) hiddenInput.focus();
+        handleKey(e);
+    });
+
+    window.onload = startTest;
+</script>
+
+</body>
+</html>

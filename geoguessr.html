@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>geoguessr!!!!!</title>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.3/dist/leaflet.css" />
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: 'Comic Sans MS', cursive, sans-serif;
+      background: linear-gradient(to bottom, #ffe6e6, #ffcccc);
+      color: #ff6666;
+      text-align: center;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      height: 100vh;
+      overflow: hidden;
+    }
+
+    h1 {
+      font-size: 2.5rem;
+      margin-top: 20px;
+      text-shadow: 2px 2px #ff9999;
+    }
+
+    img {
+      max-width: 300px;
+      border-radius: 15px;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+      margin: 20px 0;
+    }
+
+    #map {
+      flex: 1; 
+      width: 90%; 
+      margin: 10px auto;
+      border: 2px solid #ff9999;
+      border-radius: 15px;
+    }
+
+    .pin-button {
+      margin: 20px 0;
+      width: 100px;
+      height: 100px;
+      background-color: #ff6666;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 2rem;
+      color: #fff;
+      border: none;
+      cursor: pointer;
+      outline: none;
+      animation: pulse 1.5s infinite;
+      box-shadow: 0 0 15px rgba(255, 102, 102, 0.7);
+      transition: background-color 0.5s, color 0.5s;
+    }
+
+    .pin-button.success {
+      background-color: #66b266;
+      animation: pulse-green 1.5s infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% {
+        transform: scale(1);
+        box-shadow: 0 0 15px rgba(255, 102, 102, 0.7);
+      }
+      50% {
+        transform: scale(1.2);
+        box-shadow: 0 0 25px rgba(255, 102, 102, 1);
+      }
+    }
+
+    @keyframes pulse-green {
+      0%, 100% {
+        transform: scale(1);
+        box-shadow: 0 0 15px rgba(102, 178, 102, 0.7);
+      }
+      50% {
+        transform: scale(1.2);
+        box-shadow: 0 0 25px rgba(102, 178, 102, 1);
+      }
+    }
+
+    #verification-message {
+      margin: 20px 0;
+      font-size: 1.5rem;
+      font-weight: bold;
+      display: none;
+    }
+
+    #verification-message.success {
+      color: #66b266; /* Green */
+    }
+
+    #verification-message.error {
+      color: #ff0000; /* Red */
+    }
+
+    #progress-bar-container {
+      display: none;
+      width: 80%;
+      height: 25px;
+      background-color: #ffe6e6;
+      border: 2px solid #ff9999;
+      border-radius: 15px;
+      margin: 20px 0;
+      overflow: hidden;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    }
+
+    #progress-bar {
+      height: 100%;
+      background-color: #66b266;
+      width: 0%;
+      text-align: center;
+      color: #fff;
+      font-size: 1rem;
+      font-weight: bold;
+      line-height: 25px;
+    }
+  </style>
+</head>
+<body>
+  <h1>🎄 Guess Where This Photo Was Taken! 🎄</h1>
+  <img src="blur.png" alt="Blurred Photo">
+  
+  <div id="map"></div>
+  <button class="pin-button" id="submitButton" onclick="submitGuess()">📌</button>
+
+  <div id="verification-message"></div>
+  <div id="progress-bar-container">
+    <div id="progress-bar"></div>
+  </div>
+
+  <script src="https://unpkg.com/leaflet@1.9.3/dist/leaflet.js"></script>
+  <script>
+    // Initial map setup
+    const map = L.map('map').setView([0, 0], 2); // Centered at 0,0 with zoom level 2 (world view)
+
+    // Add OpenStreetMap tiles
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      maxZoom: 18,
+      attribution: '© OpenStreetMap'
+    }).addTo(map);
+
+    // Add marker for her guess
+    let guessMarker;
+    map.on('click', (e) => {
+      if (guessMarker) {
+        map.removeLayer(guessMarker); // Remove the previous marker
+      }
+      guessMarker = L.marker(e.latlng).addTo(map); // Add a simple marker
+    });
+
+    // Correct location
+    const targetLat = 39.33000605999728;
+    const targetLng = -76.62059957805523;
+
+    // Submit guess function
+    function submitGuess() {
+      const verificationMessage = document.getElementById("verification-message");
+      const progressBarContainer = document.getElementById("progress-bar-container");
+      const progressBar = document.getElementById("progress-bar");
+      const submitButton = document.getElementById("submitButton");
+
+      if (!guessMarker) {
+        verificationMessage.textContent = "Please make a guess by clicking on the map!";
+        verificationMessage.className = "error";
+        verificationMessage.style.display = "block";
+        return;
+      }
+
+      const guessCoords = guessMarker.getLatLng();
+      const guessedLat = guessCoords.lat;
+      const guessedLng = guessCoords.lng;
+
+      const distance = calculateDistance(guessedLat, guessedLng, targetLat, targetLng);
+      const score = Math.round(5000 * Math.exp(-10 * distance / 20036)); // Max Earth's circumference in km
+
+      if (score >= 4900) {
+        // If guess is correct
+        verificationMessage.textContent = "Verification Passed! 🎉";
+        verificationMessage.className = "success";
+        verificationMessage.style.display = "block";
+
+        // Show progress bar
+        progressBarContainer.style.display = "block";
+        progressBar.style.width = `${(score / 5000) * 100}%`;
+        progressBar.textContent = `${score} points`;
+
+        // Change button to green checkmark and make it redirect to the next page
+        submitButton.textContent = "✅";
+        submitButton.className = "pin-button success";
+        submitButton.onclick = () => {
+          window.location.href = "lovetype.html"; // Redirect to the next page
+        };
+      } else {
+        // If guess is incorrect
+        verificationMessage.textContent = "Verification Failed.";
+        verificationMessage.className = "error";
+        verificationMessage.style.display = "block";
+
+        setTimeout(() => {
+          window.location.href = "verification.html"; // Redirect back to the first page
+        }, 2000); // Wait 2 seconds before redirecting
+      }
+    }
+
+    // Calculate distance between two lat/lng points using Haversine formula
+    function calculateDistance(lat1, lon1, lat2, lon2) {
+      const R = 6371; // Radius of the Earth in km
+      const dLat = deg2rad(lat2 - lat1);
+      const dLon = deg2rad(lat2 - lat1);
+      const a =
+        Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+        Math.cos(deg2rad(lat1)) * Math.cos(deg2rad(lat2)) *
+        Math.sin(dLon / 2) * Math.sin(dLon / 2);
+      const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+      return R * c; // Distance in km
+    }
+
+    function deg2rad(deg) {
+      return deg * (Math.PI / 180);
+    }
+  </script>
+</body>
+</html>
