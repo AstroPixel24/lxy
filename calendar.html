@@ -485,23 +485,27 @@
     }
 
     function findNextOfType(type, celebrations, today) {
-      for (let dateObj of celebrations) {
+    for (let dateObj of celebrations) {
+        // Force the time to 12:00 PM to avoid timezone issues
+        dateObj.setHours(12, 0, 0, 0);
         const iso = dateObj.toISOString().split("T")[0]; // "yyyy-mm-dd"
+
         if (type === "holiday" && specialDays.holidays[iso]) {
-          return formatFutureDate(dateObj, today, specialDays.holidays[iso]);
+            return formatFutureDate(dateObj, today, specialDays.holidays[iso]);
         }
         if (type === "birthday" && specialDays.birthdays.includes(iso)) {
-          return formatFutureDate(dateObj, today, "Birthday");
+            return formatFutureDate(dateObj, today, "Birthday");
         }
         if (type === "weekly" && dateObj.getDay() === 4) {
-          return formatFutureDate(dateObj, today, "Weekly Anniversary");
+            return formatFutureDate(dateObj, today, "Weekly Anniversary");
         }
         if (type === "monthly" && dateObj.getDate() === 22) {
-          return formatFutureDate(dateObj, today, "Monthly Anniversary");
+            return formatFutureDate(dateObj, today, "Monthly Anniversary");
         }
-      }
-      return "";
     }
+    return "";
+}
+
 
     function formatFutureDate(dateObj, today, label) {
       const diffDays = Math.ceil((dateObj - today) / (1000 * 60 * 60 * 24));
